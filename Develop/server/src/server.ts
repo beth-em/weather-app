@@ -35,5 +35,10 @@ app.use(
 // TODO: Implement middleware to connect the routes
 app.use('/api', routes);
 
+// Catch all routes to server the frontend
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
 // Start the server on the port
 app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`));
