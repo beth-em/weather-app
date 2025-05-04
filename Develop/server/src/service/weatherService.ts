@@ -32,6 +32,8 @@ class WeatherService {
       const response = await fetch(geoUrl);
       const data = await response.json();
 
+      console.log('Geolocation response:', data);
+
       if (data.length === 0) {
         return null;
       }
@@ -54,10 +56,7 @@ class WeatherService {
   private buildGeocodeQuery(city: string): string {
     return `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${this.apiKey}`;
   }
-  // TODO: Create buildWeatherQuery method
-  private buildWeatherQuery(coordinates: Coordinates): string {
-    return `${this.baseURL}/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=metric`;
-  }
+  
   // TODO: Create fetchAndDestructureLocationData method
   private async fetchAndDestructureLocationData(query: string): Promise<Coordinates | null> {
     const locationData = await this.fetchLocationData(query);
@@ -66,6 +65,7 @@ class WeatherService {
     }
     return null;
   }
+
   // Create fetchForecastData
 private async fetchForecastData(coordinates: Coordinates): Promise<any[] | null> {
   try {
@@ -86,73 +86,54 @@ private async fetchForecastData(coordinates: Coordinates): Promise<any[] | null>
 private buildForecastQuery(coordinates: Coordinates): string {
   return `${this.baseURL}/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=metric`;
 }
-  // TODO: Create fetchWeatherData method
-private async fetchWeatherData(coordinates: Coordinates): Promise<Weather | null> {
-  try {
-    const weatherUrl = this.buildWeatherQuery(coordinates); // Use buildWeatherQuery here
-    const response = await fetch(weatherUrl);
-    const data = await response.json();
 
-    return new Weather(
-      data.main.temp,
-      data.weather[0].description,
-      data.name,
-      data.sys.country
-    );
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    return null;
-  }
-}
-  // TODO: Build parseCurrentWeather method
-  private parseCurrentWeather(response: any) {
-    return new Weather(
-      response.main.temp,
-      response.weather[0].description,
-      response.name,
-      response.sys.country,
-    );
-  }
   // TODO: Complete buildForecastArray method
-  private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] {
-    return weatherData.map((data: any) => {
-      return new Weather(
-        data.main.temp,
-        data.weather[0].description,
-        currentWeather.city,
-        currentWeather.country,
-      );
+  private buildForecastArray(currentWeather: Weather, weatherData: any[]): any[] {
+    return weatherData
+    .filter((_: any, index: number) => index % 8 ===0)
+    .slice(0, 5)
+    .map((data: any) => {
+      const readableDate: string = new Date(data.dt * 1000).toLocaleDateString('en-US');
+
+      return {
+        city: currentWeather.city,
+        date: readableDate,
+        icon: data.weather[0].icon,
+        iconDescription: data.weather[0].description,
+        tempF: Math.round((data.main.temp * 9) / 5 + 32),
+        windSpeed: data.wind.speed,
+        humidity: data.main.humidity,
+      };
     });
   }
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string): Promise<Weather | Weather[] | null> {
-    const coordinates = await this.fetchAndDestructureLocationData(city); // Fetch and destructure location data
+    const coordinates = await this.fetchAndDestructureLocationData(city);
+
     if (!coordinates) {
       console.log('City not found');
       return null;
     }
   
-    const weatherData = await this.fetchWeatherData(coordinates); // Fetch current weather data
-    if (!weatherData) {
-      console.log('Weather data is not available');
-      return null;
-    }
-  
-    const currentWeather = this.parseCurrentWeather(weatherData);
-  
     // Fetch the forecast data using the new method
     const forecastData = await this.fetchForecastData(coordinates);
   
     // Check if forecastData is null before passing it to buildForecastArray
-    if (forecastData) {
-      const forecast = this.buildForecastArray(currentWeather, forecastData); // Process the forecast data
-      console.log(forecast); // Log the forecast data (for debugging)
-      return forecast; // Return the forecast (an array of Weather objects)
-    } else {
+    if (!forecastData) {
       console.log('No forecast data available');
+      return null;
     }
-  
-    return currentWeather; // Return the current weather if no forecast data
+
+    const currentWeather = new Weather(
+      0,
+      '',
+      city,
+      'US'
+    );
+
+    const forecast = this.buildForecastArray(currentWeather, forecastData);
+    console.log('Forecast:', forecast);
+    return forecast; 
   }
 }
 

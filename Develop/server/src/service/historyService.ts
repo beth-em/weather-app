@@ -15,7 +15,7 @@ class HistoryService {
   private filePath: string;
 
   constructor() {
-    this.filePath = path.join(__dirname, './server/db/db.json');
+    this.filePath = path.join(__dirname, '../../db/db.json');
   } 
   // TODO: Define a read method that reads from the searchHistory.json file
   private async read(): Promise<City[]> {

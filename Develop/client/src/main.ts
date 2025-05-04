@@ -36,15 +36,21 @@ API Calls
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchWeather = async (cityName: string) => {
-  const response = await fetch(`http://localhost:3001/api/weather?city=${cityName}`, {
+  const response = await fetch(`/api/weather`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ cityName }),
+    body: JSON.stringify({ city: cityName }),
   });
 
   const weatherData = await response.json();
+
+  if (!Array.isArray(weatherData)) {
+    console.error('Weather fetch failed:', weatherData);
+    alert(weatherData.message || 'Could not fetch weather data.');
+    return;
+  }
 
   console.log('weatherData: ', weatherData);
 
@@ -53,7 +59,7 @@ const fetchWeather = async (cityName: string) => {
 };
 
 const fetchSearchHistory = async () => {
-  const history = await fetch(`${API_BASE_URL}/api/weather/history`, {
+  const history = await fetch(`/api/weather/history`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -63,7 +69,7 @@ const fetchSearchHistory = async () => {
 };
 
 const deleteCityFromHistory = async (id: string) => {
-  await fetch(`${API_BASE_URL}/api/weather/history/${id}`, {
+  await fetch(`/api/weather/history/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',

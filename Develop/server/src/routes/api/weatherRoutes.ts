@@ -30,6 +30,8 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ message: 'Weather data not found for this city' });
     }
   } catch (error) {
+    console.error('Error retrieving weather data', error);
+
     if (error instanceof Error) {
     return res.status(500).json({ message: 'Error retreiving weather data', error: error.message });
   } else {
