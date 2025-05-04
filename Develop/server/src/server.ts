@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3001;
 
 // TODO: Serve static files of entire client dist folder
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 
 // TODO: Implement middleware for parsing JSON and urlencoded form data
 app.use(express.json());
@@ -37,7 +37,7 @@ app.use('/api', routes);
 
 // Catch all routes to server the frontend
 app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 
 // Start the server on the port
