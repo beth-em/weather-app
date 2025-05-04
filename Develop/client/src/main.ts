@@ -33,10 +33,10 @@ const humidityEl: HTMLParagraphElement = document.getElementById(
 API Calls
 
 */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = '/api';
 
 const fetchWeather = async (cityName: string) => {
-  const response = await fetch(`/api/weather`, {
+  const response = await fetch(`${API_BASE_URL}/weather`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const fetchWeather = async (cityName: string) => {
 };
 
 const fetchSearchHistory = async () => {
-  const history = await fetch(`/api/weather/history`, {
+  const history = await fetch(`${API_BASE_URL}/weather/history`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const fetchSearchHistory = async () => {
 };
 
 const deleteCityFromHistory = async (id: string) => {
-  await fetch(`/api/weather/history/${id}`, {
+  await fetch(`${API_BASE_URL}/weather/history/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
